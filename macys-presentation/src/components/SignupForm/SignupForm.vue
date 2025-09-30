@@ -67,14 +67,20 @@
         </div>
       </div>
 
+      <!-- Success message -->
+      <div v-if="isSubmitted" class="mb-4 p-3 bg-green-100 text-green-700 rounded text-center">
+        Thank you for signing up! You will receive your 25% off coupon via email.
+      </div>
+      
       <!-- Submit button -->
       <button 
+        v-if="!isSubmitted"
         type="submit" 
         class="btn btn-primary w-full" 
-        :disabled="!isFormValid"
-        :class="{ 'opacity-50 cursor-not-allowed': !isFormValid }"
+        :disabled="!isFormValid || isLoading"
+        :class="{ 'opacity-50 cursor-not-allowed': !isFormValid || isLoading }"
       >
-        Submit
+        {{ isLoading ? 'Submitting...' : 'Submit' }}
       </button>
     </form>
   </div>
@@ -91,7 +97,9 @@ export default {
       birthDay: '',
       birthYear: '',
       captchaChecked: false,
-      currentYear: new Date().getFullYear()
+      currentYear: new Date().getFullYear(),
+      isLoading: false,
+      isSubmitted: false
     }
   },
   computed: {
@@ -120,9 +128,61 @@ export default {
     }
   },
   methods: {
-    submitForm() {
+    async submitForm() {
       if (this.isFormValid) {
-        alert('Form submitted successfully! You will receive your 25% off coupon via email.');
+        this.isLoading = true;
+        
+        // Collect the form data
+        const formData = {
+          email: this.email,
+          zipCode: this.zipCode,
+          birthDate: `${this.birthYear}-${this.birthMonth.toString().padStart(2, '0')}-${this.birthDay.toString().padStart(2, '0')}`
+        };
+        
+        // Log the data to console (simulating API call)
+        console.log('Sending email signup data:', formData);
+        
+        try {
+          // Simulate API call with a delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Mock API call
+          const mockApiCall = async (data) => {
+            // Simulate network request
+            await new Promise(resolve => setTimeout(resolve, 500));
+            // Return a mock response
+            return {
+              success: true,
+              message: 'Email subscription successful!',
+              data: {
+                couponCode: 'WELCOME25',
+                expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
+              }
+            };
+          };
+          
+          // Call the mock API
+          const response = await mockApiCall(formData);
+          
+          // Log the mock response
+          console.log('Email signup response:', response);
+          
+          // Handle successful response
+          this.isSubmitted = true;
+          
+          // Reset form after successful submission
+          this.email = '';
+          this.zipCode = '';
+          this.birthMonth = '';
+          this.birthDay = '';
+          this.birthYear = '';
+          this.captchaChecked = false;
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          alert('An error occurred. Please try again.');
+        } finally {
+          this.isLoading = false;
+        }
       }
     }
   }

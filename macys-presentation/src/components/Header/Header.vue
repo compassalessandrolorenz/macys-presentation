@@ -52,7 +52,8 @@
           <li><a href="#" class="whitespace-nowrap">Gifts</a></li>
           <li><a href="#" class="whitespace-nowrap">New & Trending</a></li>
           <li><a href="#" class="whitespace-nowrap text-red-600">Sale</a></li>
-          <li v-if="!isAuthenticated"><router-link to="/signup" class="whitespace-nowrap">Sign Up</router-link></li>
+          <li v-if="!isAuthenticated"><router-link to="/signup" class="whitespace-nowrap">Email Signup</router-link></li>
+          <li v-if="!isAuthenticated"><router-link to="/register" class="whitespace-nowrap">Register</router-link></li>
           <li v-if="!isAuthenticated"><router-link to="/signin" class="whitespace-nowrap">Sign In</router-link></li>
           <li v-if="isAuthenticated"><router-link to="/welcome" class="whitespace-nowrap">My Account</router-link></li>
         </ul>
