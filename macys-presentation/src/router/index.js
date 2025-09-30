@@ -9,7 +9,7 @@ const RegisterPage = () => import('../views/Register.vue')
 const routes = [
   {
     path: '/',
-    redirect: '/signup'
+    redirect: '/register'
   },
   {
     path: '/signup',
