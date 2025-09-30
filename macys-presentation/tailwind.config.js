@@ -7,8 +7,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'macy-red': '#E22D34',
-        'macy-blue': '#0C2340',
+        red: {
+          macys: '#d32f2f',
+        },
       },
     },
   },

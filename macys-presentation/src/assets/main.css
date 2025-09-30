@@ -1,0 +1,33 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+@reference "tailwindcss";
+
+@layer base {
+  body {
+    font-family: Arial, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded font-bold uppercase;
+  }
+
+  .btn-primary {
+    @apply bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .input-field {
+    @apply w-full border border-gray-300 px-3 py-2 rounded;
+  }
+
+  .container-center {
+    @apply mx-auto max-w-4xl px-4 w-screen flex flex-col items-center justify-center text-center;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
