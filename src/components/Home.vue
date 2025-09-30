@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home text-center">
     <section class="mb-8">
       <h2 class="text-3xl font-bold mb-4">Welcome to Macy's Presentation</h2>
       <p class="text-lg">This is a demonstration of a Vue.js application for Macy's.</p>
@@ -7,7 +7,7 @@
     
     <section class="mb-8">
       <h3 class="text-2xl font-semibold mb-4">Featured Products</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center">
         <div v-for="(product, index) in products" :key="index" class="bg-white p-4 rounded shadow">
           <h4 class="text-xl font-medium">{{ product.name }}</h4>
           <p class="text-gray-600">{{ product.description }}</p>

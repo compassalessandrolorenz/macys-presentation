@@ -3,7 +3,7 @@
     <h1 class="text-2xl font-bold">Macy's Presentation</h1>
   </header>
   
-  <main class="container mx-auto p-4">
+  <main class="container-center p-4">
     <router-view />
   </main>
   
