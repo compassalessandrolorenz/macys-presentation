@@ -52,7 +52,7 @@
       </form>
 
       <div class="mt-4 text-center text-sm">
-        <p>Don't have an account? <a href="/signup" class="text-red-600">Sign up</a></p>
+        <p>Don't have an account? <a href="/register" class="text-red-600">Register</a></p>
       </div>
     </div>
   </div>

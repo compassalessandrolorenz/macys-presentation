@@ -113,7 +113,7 @@
 
 <script>
 export default {
-  name: 'SignupForm',
+  name: 'SubscribeForm',
   data() {
     return {
       email: '',
@@ -165,7 +165,7 @@ export default {
         };
         
         // Log the data to console (simulating API call)
-        console.log('Sending email signup data:', formData);
+        console.log('Sending email subscribe data:', formData);
         
         try {
           // Simulate API call with a delay
@@ -190,7 +190,7 @@ export default {
           const response = await mockApiCall(formData);
           
           // Log the mock response
-          console.log('Email signup response:', response);
+          console.log('Email subscribe response:', response);
           
           // Handle successful response
           this.isSubmitted = true;

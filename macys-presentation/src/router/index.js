@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // Import page components
-const SignupPage = () => import('../views/SignupPage.vue')
+const SubscribePage = () => import('../views/SubscribePage.vue')
 const SigninPage = () => import('../views/SigninPage.vue')
 const WelcomePage = () => import('../views/WelcomePage.vue')
 const RegisterPage = () => import('../views/Register.vue')
@@ -12,9 +12,9 @@ const routes = [
     redirect: '/register'
   },
   {
-    path: '/signup',
-    name: 'Signup',
-    component: SignupPage
+    path: '/subscribe',
+    name: 'Subscribe',
+    component: SubscribePage
   },
   {
     path: '/register',
