@@ -76,6 +76,27 @@ def create_app(config_name='default'):
             
         return jsonify(result), 200
 
+    @app.route('/api/subscribe', methods=['POST'])
+    def subscribe():
+        """Endpoint para inscrição na lista de emails."""
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Dados não fornecidos.'}), 400
+
+        email = data.get('email')
+        zip_code = data.get('zipCode')
+        birth_date = data.get('birthDate')
+
+        if not all([email, zip_code, birth_date]):
+            return jsonify({'success': False, 'message': 'Todos os campos são obrigatórios.'}), 400
+        
+        result = user_service.subscribe_user(email, zip_code, birth_date)
+        
+        if not result['success']:
+            return jsonify(result), 400
+            
+        return jsonify(result), 200
+
     return app
 
 if __name__ == '__main__':

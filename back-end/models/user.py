@@ -14,6 +14,13 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     activation_token = db.Column(db.String(36), unique=True, nullable=True)
     token_expiration = db.Column(db.DateTime, nullable=True)
+    
+    # Subscription fields
+    zip_code = db.Column(db.String(5), nullable=True)
+    birth_date = db.Column(db.Date, nullable=True)
+    subscribed = db.Column(db.Boolean, default=False, nullable=False)
+    subscription_date = db.Column(db.DateTime, nullable=True)
+    coupon_code = db.Column(db.String(20), nullable=True)
 
     def __repr__(self):
         return f'<User {self.name}>'

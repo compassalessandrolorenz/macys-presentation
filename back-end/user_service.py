@@ -1,7 +1,9 @@
 import re
 import hashlib
 import uuid
-from datetime import datetime, timedelta
+import random
+import string
+from datetime import datetime, timedelta, date
 from models import db
 from models.user import User
 
@@ -25,6 +27,22 @@ def is_strong_password(password):
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         return False
     return True
+
+def is_valid_zip_code(zip_code):
+    """Valida o formato do código postal (5 dígitos)."""
+    pattern = r'^\d{5}$'
+    return bool(re.match(pattern, zip_code))
+
+def is_over_18(birth_date):
+    """Verifica se o usuário tem 18 anos ou mais."""
+    today = date.today()
+    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+    return age >= 18
+
+def generate_coupon_code():
+    """Gera um código de cupom único."""
+    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    return f"SAVE25-{random_part}"
 
 # --- Funções Auxiliares ---
 
@@ -106,5 +124,52 @@ def authenticate_user(email, password):
         'success': True,
         'message': 'Autenticação bem-sucedida.',
         'user': {'id': user.id, 'name': user.name, 'email': user.email}
+    }
+
+def subscribe_user(email, zip_code, birth_date):
+    """Inscreve um usuário na lista de emails."""
+    # Busca o usuário pelo email
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return {'success': False, 'message': 'Usuário não encontrado. Por favor, crie uma conta primeiro.'}
+    
+    # Valida o código postal
+    if not is_valid_zip_code(zip_code):
+        return {'success': False, 'message': 'Código postal inválido. Deve conter 5 dígitos.'}
+    
+    # Converte a string de data para objeto date
+    try:
+        if isinstance(birth_date, str):
+            birth_date_obj = datetime.strptime(birth_date, '%Y-%m-%d').date()
+        else:
+            birth_date_obj = birth_date
+    except ValueError:
+        return {'success': False, 'message': 'Formato de data inválido. Use YYYY-MM-DD.'}
+    
+    # Verifica se o usuário tem 18 anos ou mais
+    if not is_over_18(birth_date_obj):
+        return {'success': False, 'message': 'Você deve ter 18 anos ou mais para se inscrever.'}
+    
+    # Verifica se o usuário já está inscrito
+    if user.subscribed:
+        return {'success': False, 'message': 'Este email já está inscrito.'}
+    
+    # Gera um código de cupom único
+    coupon_code = generate_coupon_code()
+    
+    # Atualiza o registro do usuário
+    user.zip_code = zip_code
+    user.birth_date = birth_date_obj
+    user.subscribed = True
+    user.subscription_date = datetime.utcnow()
+    user.coupon_code = coupon_code
+    
+    db.session.commit()
+    
+    return {
+        'success': True,
+        'message': 'Inscrição realizada com sucesso!',
+        'coupon_code': coupon_code
     }
 
