@@ -104,6 +104,44 @@ class AuthService {
   isLoggedIn() {
     return this.getCurrentUser() !== null;
   }
+
+  /**
+   * Subscribe user to email list
+   * @param {string} email - User's email
+   * @param {string} zipCode - User's zip code
+   * @param {string} birthDate - User's birth date (YYYY-MM-DD format)
+   * @returns {Promise} - Promise with subscription result
+   */
+  async subscribe(email, zipCode, birthDate) {
+    try {
+      console.log(`Making API request to ${API_URL}/subscribe with data:`, {
+        email,
+        zipCode,
+        birthDate
+      });
+      
+      const response = await fetch(`${API_URL}/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, zipCode, birthDate }),
+      });
+
+      console.log('API response status:', response.status);
+      
+      const data = await response.json();
+      console.log('API response data:', data);
+      
+      return data;
+    } catch (error) {
+      console.error('Subscription error details:', error);
+      return {
+        success: false,
+        message: 'An error occurred during subscription. Please try again.'
+      };
+    }
+  }
 }
 
 export default new AuthService();

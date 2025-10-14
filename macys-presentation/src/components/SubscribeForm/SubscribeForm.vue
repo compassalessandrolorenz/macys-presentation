@@ -39,16 +39,16 @@
       <div class="mb-4">
         <label class="block text-sm mb-1">birth date</label>
         <div class="flex gap-2">
-          <select v-model="birthMonth" class="input-field flex-1" required>
-            <option value="" disabled selected>MM</option>
+          <select v-model="birthMonth" class="input-field flex-1">
+            <option :value="null" disabled>MM</option>
             <option v-for="i in 12" :key="`month-${i}`" :value="i">{{ i }}</option>
           </select>
-          <select v-model="birthDay" class="input-field flex-1" required>
-            <option value="" disabled selected>DD</option>
+          <select v-model="birthDay" class="input-field flex-1">
+            <option :value="null" disabled>DD</option>
             <option v-for="i in 31" :key="`day-${i}`" :value="i">{{ i }}</option>
           </select>
-          <select v-model="birthYear" class="input-field flex-1" required>
-            <option value="" disabled selected>YYYY</option>
+          <select v-model="birthYear" class="input-field flex-1">
+            <option :value="null" disabled>YYYY</option>
             <option v-for="i in 100" :key="`year-${i}`" :value="currentYear - i">{{ currentYear - i }}</option>
           </select>
         </div>
@@ -112,15 +112,17 @@
 </template>
 
 <script>
+import AuthService from '../../services/auth.service.js';
+
 export default {
   name: 'SubscribeForm',
   data() {
     return {
       email: '',
       zipCode: '',
-      birthMonth: '',
-      birthDay: '',
-      birthYear: '',
+      birthMonth: null,
+      birthDay: null,
+      birthYear: null,
       captchaChecked: false,
       currentYear: new Date().getFullYear(),
       isLoading: false,
@@ -144,10 +146,28 @@ export default {
       if (isBirthDateValid) {
         const birthDate = new Date(this.birthYear, this.birthMonth - 1, this.birthDay);
         const today = new Date();
-        const ageDate = new Date(today - birthDate);
-        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+        const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
         isOver18 = age >= 18;
       }
+      
+      // DIAGNOSTIC LOGGING - Remove after debugging
+      console.log('=== Form Validation Debug ===');
+      console.log('Email:', this.email, '| Valid:', isEmailValid);
+      console.log('Zip Code:', this.zipCode, '| Valid:', isZipValid);
+      console.log('Birth Date:', { month: this.birthMonth, day: this.birthDay, year: this.birthYear });
+      console.log('Birth Date Valid:', isBirthDateValid);
+      if (isBirthDateValid) {
+        const birthDate = new Date(this.birthYear, this.birthMonth - 1, this.birthDay);
+        const today = new Date();
+        const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+        console.log('Birth Date Object:', birthDate);
+        console.log('Today:', today);
+        console.log('Calculated Age:', age);
+      }
+      console.log('Is Over 18:', isOver18);
+      console.log('Captcha Checked:', this.captchaChecked);
+      console.log('Final isFormValid:', isEmailValid && isZipValid && isBirthDateValid && isOver18 && this.captchaChecked);
+      console.log('===========================');
       
       return isEmailValid && isZipValid && isBirthDateValid && isOver18 && this.captchaChecked;
     }
@@ -164,44 +184,38 @@ export default {
           birthDate: `${this.birthYear}-${this.birthMonth.toString().padStart(2, '0')}-${this.birthDay.toString().padStart(2, '0')}`
         };
         
-        // Log the data to console (simulating API call)
+        // Log the data to console
         console.log('Sending email subscribe data:', formData);
         
         try {
-          // Simulate API call with a delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Call the real API
+          const response = await AuthService.subscribe(
+            formData.email,
+            formData.zipCode,
+            formData.birthDate
+          );
           
-          // Mock API call
-          const mockApiCall = async (data) => {
-            // Simulate network request
-            await new Promise(resolve => setTimeout(resolve, 500));
-            // Return a mock response
-            return {
-              success: true,
-              message: 'Email subscription successful!',
-              data: {
-                couponCode: 'WELCOME25',
-                expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
-              }
-            };
-          };
-          
-          // Call the mock API
-          const response = await mockApiCall(formData);
-          
-          // Log the mock response
+          // Log the response
           console.log('Email subscribe response:', response);
           
-          // Handle successful response
-          this.isSubmitted = true;
-          
-          // Reset form after successful submission
-          this.email = '';
-          this.zipCode = '';
-          this.birthMonth = '';
-          this.birthDay = '';
-          this.birthYear = '';
-          this.captchaChecked = false;
+          if (response.success) {
+            // Handle successful response
+            this.isSubmitted = true;
+            
+            // Display coupon code to user
+            alert(`Thank you for subscribing! Your coupon code is: ${response.coupon_code}`);
+            
+            // Reset form after successful submission
+            this.email = '';
+            this.zipCode = '';
+            this.birthMonth = null;
+            this.birthDay = null;
+            this.birthYear = null;
+            this.captchaChecked = false;
+          } else {
+            // Handle error response
+            alert(response.message || 'An error occurred. Please try again.');
+          }
         } catch (error) {
           console.error('Error submitting form:', error);
           alert('An error occurred. Please try again.');
