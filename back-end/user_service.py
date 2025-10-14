@@ -59,12 +59,12 @@ def is_email_unique(email):
 def create_user(name, email, password):
     """Cria um novo usuário."""
     if not is_email_unique(email):
-        return {'success': False, 'message': 'Este email já está cadastrado.'}
+        return {'success': False, 'message': 'This email is already registered.'}
     if not is_valid_email(email):
-        return {'success': False, 'message': 'Email inválido.'}
+        return {'success': False, 'message': 'Invalid email.'}
     if not is_strong_password(password):
-        return {'success': False, 'message': 'Senha não atende aos requisitos mínimos de segurança.'}
-    
+        return {'success': False, 'message': 'Password does not meet minimum security requirements.'}
+
     token = str(uuid.uuid4())
     token_expiration = datetime.utcnow() + timedelta(days=1)
     
@@ -81,7 +81,7 @@ def create_user(name, email, password):
     
     return {
         'success': True,
-        'message': 'Usuário criado com sucesso.',
+        'message': 'User created successfully.',
         'user_id': new_user.id,
         'token': token
     }
@@ -98,45 +98,45 @@ def activate_account(token):
     user = User.query.filter_by(activation_token=token).first()
     
     if not user:
-        return {'success': False, 'message': 'Token de ativação inválido.'}
+        return {'success': False, 'message': 'Invalid activation token.'}
         
     if user.token_expiration < datetime.utcnow():
-        return {'success': False, 'message': 'Token de ativação expirado.'}
-    
+        return {'success': False, 'message': 'Activation token expired.'}
+
     user.active = True
     user.activation_token = None
     user.token_expiration = None
     db.session.commit()
     
-    return {'success': True, 'message': 'Conta ativada com sucesso.'}
+    return {'success': True, 'message': 'Account activated successfully.'}
 
 def authenticate_user(email, password):
-    """Autentica um usuário."""
+    """Authenticates a user."""
     user = User.query.filter_by(email=email).first()
     
     if not user or user.password != hash_password(password):
-        return {'success': False, 'message': 'Email ou senha incorretos.'}
+        return {'success': False, 'message': 'Invalid email or password.'}
     
     if not user.active:
-        return {'success': False, 'message': 'Conta não ativada. Verifique seu email.'}
+        return {'success': False, 'message': 'Account not activated. Check your email.'}
     
     return {
         'success': True,
-        'message': 'Autenticação bem-sucedida.',
+        'message': 'Authentication successful.',
         'user': {'id': user.id, 'name': user.name, 'email': user.email}
     }
 
 def subscribe_user(email, zip_code, birth_date):
-    """Inscreve um usuário na lista de emails."""
+    """Subscribes a user to the email list."""
     # Busca o usuário pelo email
     user = User.query.filter_by(email=email).first()
     
     if not user:
-        return {'success': False, 'message': 'Usuário não encontrado. Por favor, crie uma conta primeiro.'}
+        return {'success': False, 'message': 'User not found.'}
     
     # Valida o código postal
     if not is_valid_zip_code(zip_code):
-        return {'success': False, 'message': 'Código postal inválido. Deve conter 5 dígitos.'}
+        return {'success': False, 'message': 'Invalid zip code. Must be 5 digits.'}
     
     # Converte a string de data para objeto date
     try:
